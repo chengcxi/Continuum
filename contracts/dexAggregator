@@ -1,0 +1,87 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
+import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
+import "./Vault.sol";  // Import your Vault contract
+import "./TTC.sol";  // Import your TTC contract
+
+contract DEXAggregator {
+    address public vault;
+    address public ttc;
+    address public governance;
+    uint256 public feeBasisPoints;
+    IUniswapV3Factory public uniswapFactory;
+
+    enum OrderType { Market, Limit }
+    struct Order {
+        OrderType orderType;
+        address tokenIn;
+        address tokenOut;
+        uint256 amountIn;
+        uint256 minAmountOut;
+    }
+
+    mapping(uint256 => Order) public orders;
+    uint256 public nextOrderId = 1;
+
+    event FeeUpdated(uint256 newFee);
+    event GovernanceUpdated(address newGovernance);
+    event OrderCreated(uint256 orderId);
+
+    constructor(address _vault, address _ttc, address _uniswapFactory) {
+        vault = _vault;
+        ttc = _ttc;
+        uniswapFactory = IUniswapV3Factory(_uniswapFactory);
+        governance = msg.sender;  // Initialize governance to the contract deployer
+    }
+
+    modifier onlyGovernance() {
+        require(msg.sender == governance, "Not authorized");
+        _;
+    }
+
+    // Fee Management
+    function setFee(uint256 _feeBasisPoints) external onlyGovernance {
+        feeBasisPoints = _feeBasisPoints;
+        emit FeeUpdated(_feeBasisPoints);
+    }
+
+    function calculateFee(uint256 amount) public view returns (uint256) {
+        return (amount * feeBasisPoints) / 10000;
+    }
+
+    // Governance
+    function setGovernance(address _governance) external onlyGovernance {
+        governance = _governance;
+        emit GovernanceUpdated(_governance);
+    }
+
+    // Order Management
+    function createOrder(OrderType _orderType, address _tokenIn, address _tokenOut, uint256 _amountIn, uint256 _minAmountOut) external {
+        orders[nextOrderId] = Order(_orderType, _tokenIn, _tokenOut, _amountIn, _minAmountOut);
+        emit OrderCreated(nextOrderId);
+        nextOrderId++;
+    }
+
+    // Function to get the best trade route (Placeholder)
+    function getBestTradeRoute(address tokenIn, address tokenOut, uint256 amountIn) public view returns (address pool) {
+        // Placeholder logic to find the best pool, possibly interacting with UniswapX contracts
+        return address(0);
+    }
+
+    // Function to execute trade (Placeholder)
+    function executeTrade(uint256 orderId) public {
+        Order memory order = orders[orderId];
+        address pool = getBestTradeRoute(order.tokenIn, order.tokenOut, order.amountIn);
+        
+        // Placeholder logic to execute trade on the selected pool
+        // Interact with Vault and TTC contracts as needed
+    }
+
+    // Utility Functions (Placeholder)
+    function getEstimatedOutput(address tokenIn, address tokenOut, uint256 amountIn) public view returns (uint256 estimatedOutput) {
+        // Placeholder logic to estimate output amount
+        return 0;
+    }
+}
