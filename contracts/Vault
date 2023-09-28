@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/security/Ownable.sol";
+
+contract Vault is ERC4626Fees, Ownable {
+    using SafeMath for uint256;
+
+    // Mapping to keep track of the assets held by the vault
+    mapping(address => uint256) public assetBalances;
+
+    // Event to log deposits
+    event AssetDeposited(address indexed asset, uint256 amount, address indexed depositor);
+
+    // Event to log withdrawals
+    event AssetWithdrawn(address indexed asset, uint256 amount, address indexed receiver);
+
+    constructor() ERC4626Fees() Ownable() {}
+
+    // Function to deposit assets into the vault
+    function depositAsset(address asset, uint256 amount) external onlyOwner {
+        require(amount > 0, "Amount must be greater than 0");
+        require(IERC20(asset).transferFrom(msg.sender, address(this), amount), "Transfer failed");
+
+        assetBalances[asset] = assetBalances[asset].add(amount);
+
+        emit AssetDeposited(asset, amount, msg.sender);
+    }
+
+    // Function to withdraw assets from the vault
+    function withdrawAsset(address asset, uint256 amount, address to) external onlyOwner {
+        require(amount > 0, "Amount must be greater than 0");
+        require(assetBalances[asset] >= amount, "Insufficient balance");
+
+        require(IERC20(asset).transfer(to, amount), "Transfer failed");
+
+        assetBalances[asset] = assetBalances[asset].sub(amount);
+
+        emit AssetWithdrawn(asset, amount, to);
+    }
+
+    // Override other functions from ERC4626Fees and add your logic here
+}
