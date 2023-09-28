@@ -1,0 +1,36 @@
+import { ethers } from 'ethers';
+import { deploy } from './ethers-lib';  // Assuming you have a deploy function in ethers-lib.ts
+
+(async () => {
+  // Initialize provider and signer
+  const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+  const signer = provider.getSigner();
+
+  // Deploy TTC (Continuum Token Contract)
+  const ttc = await deploy('Continuum', [], signer);
+  console.log(`TTC deployed at: ${ttc.address}`);
+
+  // Deploy Vault
+  const vault = await deploy('Vault', [], signer);
+  console.log(`Vault deployed at: ${vault.address}`);
+
+  // Deploy PriceTracking
+  const priceTracking = await deploy('PriceTracking', ['<Chainlink Aggregator Address>'], signer);
+  console.log(`PriceTracking deployed at: ${priceTracking.address}`);
+
+  // TODO: Deploy DEX Aggregator Contract
+  // const dexAggregator = await deploy('DEXAggregator', [], signer);
+  // console.log(`DEX Aggregator deployed at: ${dexAggregator.address}`);
+
+  // TODO: Initialize TTC with Vault and other contracts
+  // await ttc.initializeVault(vault.address);
+
+  // TODO: Initialize Vault with TTC and other contracts
+  // await vault.initializeTTC(ttc.address);
+
+  // TODO: Initialize DEX Aggregator with Vault and PriceTracking
+  // await dexAggregator.initialize(vault.address, priceTracking.address);
+
+  // TODO: Additional setup like adding liquidity, setting initial prices, etc.
+
+})();
