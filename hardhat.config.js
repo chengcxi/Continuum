@@ -3,7 +3,7 @@ require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.17",
+  solidity: "0.8.21",
   networks: {
     rinkeby: {
       url: process.env.INFURA_RINKEBY_ENDPOINT,
