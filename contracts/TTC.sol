@@ -9,8 +9,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract Continuum is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, PausableUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
+    address payable public owner;
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
+    constructor() ERC20("Continuum", "TTC") {
+        owner = payable(msg.sender);
+        _mint(owner, 1000000 * (10 ** decimals()));
         _disableInitializers();
     }
 
@@ -31,7 +34,7 @@ contract Continuum is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable,
     }
 
     function mint(address to, uint256 amount) public onlyOwner {
-        _mint(to, amount);
+        super._mint(to, amount);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount)
