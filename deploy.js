@@ -6,7 +6,7 @@ async function main() {
 
   await continuum.deployed();
 
-  console.log("Ocean Token deployed: ", continuum.address);
+  console.log("Continuum deployed: ", continuum.address);
 }
 
 main().catch((error) => {
