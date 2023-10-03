@@ -19,7 +19,7 @@ abstract contract ERC20Capped is ERC20 {
     /**
      * @dev The supplied cap is not a valid cap.
      */
-    error ERC20InvalidCap(uint256 cap);
+    error ERC20InvalidCap(uint256 1000000);
 
     /**
      * @dev Sets the value of the `cap`. This value is immutable, it can only be
